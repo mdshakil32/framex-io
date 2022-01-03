@@ -1,38 +1,89 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import useItems from "../../../hooks/useItems";
+import "./AddServices.css";
 
 const AddServices = () => {
-  const [addServices, setAddServices] = useState({
-    title: "",
-    description: "",
-    price: "",
-    ratings: "",
-    img: "",
-  });
+  // const [addServices, setAddServices] = useState({
+  //   title: "",
+  //   description: "",
+  //   price: "",
+  //   ratings: "",
+  //   img: "",
+  // });
+  const [formData, setFormData] = useState({});
+  const {items, addItem, deleteItem} = useItems();
 
-  const handleOnChange = (e: any) => {
+   const handleChange = (e:any) => {
     const field = e.target.name;
-    const newData = { ...addServices, [field]: e.target.value };
-    setAddServices(newData);
+    const newData = { ...formData, [field]: e.target.value };
+    setFormData(newData);
   };
 
-  const handleAddServices = (e: any) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault();
-    fetch("https://framex-server.herokuapp.com/api/product", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(addServices),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.acknowledged) {
-          alert("Services Added Successfully");
-          e.target.reset();
-        }
-      });
+
+    addItem(formData);
+
+    e.target.reset();
   };
+  // const [showServices, setShowServices] = useState([]);
+  // const [showServices, setShowServices] = useState<any[]>([])
+
+  // const handleOnChange = (e: any) => {
+  //   const field = e.target.name;
+  //   const newData = { ...addServices, [field]: e.target.value };
+  //   setAddServices(newData);
+  // };
+
+  // const handleAddServices = (e: any) => {
+  //   e.preventDefault();
+  //   fetch("https://framex-server.herokuapp.com/api/product", {
+  //     method: "POST",
+  //     headers: { "content-type": "application/json" },
+  //     body: JSON.stringify(addServices),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       if (data.acknowledged) {
+  //         alert("Services Added Successfully");
+  //         e.target.reset();
+  //       }
+  //     });
+  // };
+
+  // // get all services 
+  //   useEffect(()=>{
+  //       fetch('https://framex-server.herokuapp.com/api/products')
+  //       .then(res => res.json())
+  //       .then(data => {
+  //           // if(data.length !== 0){
+  //               setShowServices(data);
+  //           // }
+  //       })
+  //   },[]);
+
+  //   console.log(showServices);
+
+    // // delete order 
+    // const handleDelete =(id:any)=>{
+    //     fetch(`https://framex-server.herokuapp.com/api/products/${id}`,{
+    //         method:"DELETE"
+    //     })
+    //     .then(res=>res.json())
+    //     .then(data =>{
+    //         console.log(data);
+    //          if(data.deletedCount === 1){
+    //              alert("Confirm delete");
+    //              const remaining = showServices.filter(order=> order._id !== id);
+    //              setShowServices(remaining);
+    //          }
+    //     })
+    // }
+    
+
   return (
     <div>
-      <form onSubmit={handleAddServices}>
+      <form onSubmit={handleSubmit}>
         <div className="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
           <div className="container max-w-screen-lg mx-auto">
             <div>
@@ -57,7 +108,7 @@ const AddServices = () => {
                           id="full_name"
                           className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                           name="title"
-                          onChange={handleOnChange}
+                          onChange={handleChange}
                         />
                       </div>
 
@@ -68,7 +119,7 @@ const AddServices = () => {
                           className="h-20 border mt-1 rounded px-4 w-full bg-gray-50"
                           placeholder="Description"
                           name="description"
-                          onChange={handleOnChange}
+                          onChange={handleChange}
                         />
                       </div>
                       <div className="md:col-span-5">
@@ -79,7 +130,7 @@ const AddServices = () => {
                           className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                           placeholder="Price"
                           name="price"
-                          onChange={handleOnChange}
+                          onChange={handleChange}
                         />
                       </div>
                       <div className="md:col-span-5">
@@ -90,7 +141,7 @@ const AddServices = () => {
                           className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                           placeholder="Ratings"
                           name="ratings"
-                          onChange={handleOnChange}
+                          onChange={handleChange}
                         />
                       </div>
                       <div className="md:col-span-5">
@@ -101,7 +152,7 @@ const AddServices = () => {
                           className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                           placeholder="Img url"
                           name="img"
-                          onChange={handleOnChange}
+                          onChange={handleChange}
                         />
                       </div>
 
@@ -135,6 +186,43 @@ const AddServices = () => {
           </div>
         </div>
       </form>
+
+      {/* table  */}
+      <table className="table table-modified">
+                <thead>
+                    <tr className="p-2">
+                    
+                    <th scope="col">Product</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">ratings</th>
+                    <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        items.map(service =>
+                            <tr key={service._id} className="p-2 align-middle">                 
+                                <td data-label="Product"> {service.title} </td>
+                                <td data-label="Image">
+                                  <img  src={service.img} alt="" /> 
+                                </td>
+                                {/* <td className="" data-label="Model">{service.description}</td> */}
+
+                                <td data-label="Price">${service.price}</td>
+                                <td data-label="Status">{service.ratings} </td>
+
+                                <td data-label="Actions">
+                                    {/* <button  className="btn btn-success me-1 mb-1" data-bs-toggle="modal" data-bs-target="#exampleModal" >Update</button> */}
+
+                                    <button onClick={()=> deleteItem(service._id)}  className="del-btn" >Delete</button>
+                                </td>
+                            </tr>
+                            )
+                    }
+                    
+                </tbody>
+            </table>
     </div>
   );
 };
